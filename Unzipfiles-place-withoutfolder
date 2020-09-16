@@ -1,0 +1,45 @@
+#!/bin/sh
+
+SOURCE="C:/Users/phani/Desktop/shell/caqh/ECG/Enrollment"
+DEST1="C:/Users/phani/Desktop/shell/caqh/out"
+DEST2="C:/Users/phani/Desktop/shell/caqh/in"
+DEST3="C:/Users/phani/Desktop/shell/caqh/archive"
+
+COUNT="$(ls ${SOURCE} | grep "Standard" | wc -l)"
+
+total_files=0
+if [ $COUNT != 0 ] 
+then
+	ZIPCOUNT="$(ls ${SOURCE}/*.zip | grep "Standard" | wc -l)"
+	ZIPFILENAME="$(ls -ltr ${SOURCE} | grep ".zip" | awk '{print $9}' | awk -F'[.]' '{print $1}' )"
+
+	echo $ZIPFILENAME
+
+	for f in $SOURCE/*.zip; 
+		do 
+			unzip -d "${f%*.zip}" "$f";
+			allFiles="${f%*.zip}/*";
+			dirName="${f%*.zip}";
+			FILEDATE="${dirName:71}";
+			for f2 in $allFiles;
+				do
+					FILENAME="${f2%.*}";
+					EXTENSION="${f2##*.}";
+					FROM=$FILENAME"."$EXTENSION;
+					TO=$FILENAME"_"$FILEDATE.$EXTENSION;
+					mv $FROM $TO;
+				done
+		done
+
+	mv ${SOURCE}/*.zip ${DEST3};
+
+	cp -r ${SOURCE}/* ${DEST2};
+
+	mv ${SOURCE}/* ${DEST1};
+
+else
+	echo "No files exists"
+
+fi 
+
+
